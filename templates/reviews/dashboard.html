@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Peer Review System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+            <small class="text-muted">Welcome back, {{ user.get_full_name }}!</small>
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Active Assignments -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-tasks"></i> Active Assignments
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if active_assignments %}
+                    {% for assignment in active_assignments %}
+                    <div class="border-bottom pb-2 mb-2">
+                        <h6><a href="{% url 'reviews:assignment_detail' assignment.pk %}">{{ assignment.title }}</a></h6>
+                        <small class="text-muted">Due: {{ assignment.due_date|date:"M d, Y H:i" }}</small>
+                    </div>
+                    {% endfor %}
+                    <a href="{% url 'reviews:assignment_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                {% else %}
+                    <p class="text-muted">No active assignments available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Reviews -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-clock"></i> Reviews to Complete
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if pending_reviews %}
+                    {% for review_assignment in pending_reviews %}
+                    <div class="border-bottom pb-2 mb-2">
+                        <h6><a href="{% url 'reviews:review_submission' review_assignment.submission_to_review.pk %}">{{ review_assignment.submission_to_review.title }}</a></h6>
+                        <small class="text-muted">By: {{ review_assignment.submission_to_review.submitted_by.get_full_name }}</small>
+                    </div>
+                    {% endfor %}
+                    <a href="{% url 'reviews:my_reviews' %}" class="btn btn-sm btn-outline-warning">View All</a>
+                {% else %}
+                    <p class="text-muted">No pending reviews.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Submissions -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-file-alt"></i> My Recent Submissions
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if recent_submissions %}
+                    {% for submission in recent_submissions %}
+                    <div class="border-bottom pb-2 mb-2">
+                        <h6><a href="{% url 'reviews:submission_detail' submission.pk %}">{{ submission.title }}</a></h6>
+                        <small class="text-muted">
+                            {{ submission.assignment.title }} - {{ submission.submitted_at|date:"M d, Y" }}
+                            {% if submission.average_score %}
+                                <span class="badge bg-info">Avg: {{ submission.average_score }}/10</span>
+                            {% endif %}
+                        </small>
+                    </div>
+                    {% endfor %}
+                    <a href="{% url 'reviews:my_submissions' %}" class="btn btn-sm btn-outline-success">View All</a>
+                {% else %}
+                    <p class="text-muted">No submissions yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Reviews Received -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-star"></i> Recent Reviews Received
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if reviews_received %}
+                    {% for review in reviews_received %}
+                    <div class="border-bottom pb-2 mb-2">
+                        <h6><a href="{% url 'reviews:submission_detail' review.submission.pk %}">{{ review.submission.title }}</a></h6>
+                        <small class="text-muted">
+                            Score: {{ review.score }}/10 by {{ review.reviewer.get_full_name }}
+                            <br>{{ review.created_at|date:"M d, Y" }}
+                        </small>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No reviews received yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if editing %}Edit{% else %}Write{% endif %} Review - Peer Review System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3>
+                    <i class="fas fa-star"></i> 
+                    {% if editing %}Edit Review{% else %}Write Review{% endif %}
+                </h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    
+                    <div class="row mt-4">
+                        <div class="col-sm-6">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-save"></i> 
+                                {% if editing %}Update Review{% else %}Submit Review{% endif %}
+                            </button>
+                        </div>
+                        <div class="col-sm-6">
+                            <a href="{% url 'reviews:submission_detail' submission.pk %}" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <!-- Submission Preview -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-file-alt"></i> Submission Preview</h5>
+            </div>
+            <div class="card-body">
+                <h6>{{ submission.title }}</h6>
+                <p><strong>Author:</strong> {{ submission.submitted_by.get_full_name }}</p>
+                <p><strong>Assignment:</strong> {{ submission.assignment.title }}</p>
+                <p><strong>Submitted:</strong> {{ submission.submitted_at|date:"M d, Y H:i" }}</p>
+                
+                {% if submission.file_upload %}
+                <p><strong>File:</strong> 
+                    <a href="{{ submission.file_upload.url }}" target="_blank" class="btn btn-sm btn-outline-info">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                </p>
+                {% endif %}
+                
+                <hr>
+                <p><strong>Content Preview:</strong></p>
+                <div class="border p-2 bg-light" style="max-height: 200px; overflow-y: auto;">
+                    {{ submission.content|linebreaks|truncatewords:50 }}
+                </div>
+                
+                <a href="{% url 'reviews:submission_detail' submission.pk %}" class="btn btn-sm btn-outline-primary mt-2">
+                    <i class="fas fa-eye"></i> View Full Submission
+                </a>
+            </div>
+        </div>
+        
+        <!-- Review Guidelines -->
+        <div class="card mt-3">
+            <div class="card-header bg-info text-white">
+                <h6><i class="fas fa-lightbulb"></i> Review Guidelines</h6>
+            </div>
+            <div class="card-body small">
+                <ul class="mb-0">
+                    <li>Be constructive and respectful</li>
+                    <li>Provide specific examples</li>
+                    <li>Balance strengths and areas for improvement</li>
+                    <li>Use the 1-10 scale thoughtfully</li>
+                    <li>Focus on the content and requirements</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
